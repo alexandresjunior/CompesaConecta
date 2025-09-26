@@ -1,0 +1,217 @@
+import { FontAwesome } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { WebView } from "react-native-webview";
+import Comentario from "../Comentario";
+
+const { width } = Dimensions.get("window");
+
+function Post({ item }) {
+  const [curtido, setCurtido] = useState(false);
+
+  const renderConteudo = () => {
+    switch (item.tipo) {
+      case "TEXTO":
+        return null;
+      case "IMAGEM":
+        return (
+          <FlatList
+            data={item.imagens}
+            renderItem={({ item: imagemUrl }) => (
+              <Image source={{ uri: imagemUrl }} style={estilos.imagemPost} />
+            )}
+            keyExtractor={(imagemUrl) => imagemUrl}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            style={estilos.carousel}
+          />
+        );
+      case "VIDEO":
+        const videoId = item.videoUrl.split("v=")[1];
+        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        return (
+          <WebView
+            style={estilos.video}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            source={{ uri: embedUrl }}
+          />
+        );
+      case "ENQUETE":
+        const totalVotos = item.enquete.opcoes.reduce(
+          (acc, op) => acc + op.votos,
+          0
+        );
+        return (
+          <View style={estilos.enqueteContainer}>
+            {item.enquete.opcoes.map((opcao) => (
+              <TouchableOpacity key={opcao.id} style={estilos.opcaoEnquete}>
+                <Text style={estilos.textoOpcao}>{opcao.texto}</Text>
+                <Text style={estilos.votosOpcao}>
+                  {((opcao.votos / totalVotos) * 100).toFixed(0)}%
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View style={estilos.card}>
+      <View style={estilos.cabecalhoPost}>
+        <Image source={{ uri: item.autor.avatar }} style={estilos.avatar} />
+        <View>
+          <Text style={estilos.nomeAutor}>{item.autor.nome}</Text>
+          <Text style={estilos.timestamp}>
+            {new Date(item.timestamp).toLocaleDateString("pt-BR")}
+          </Text>
+        </View>
+      </View>
+      <Text style={estilos.legenda}>{item.legenda}</Text>
+
+      {renderConteudo()}
+
+      <View style={estilos.rodapePost}>
+        <TouchableOpacity
+          style={estilos.botaoAcao}
+          onPress={() => setCurtido(!curtido)}
+        >
+          <FontAwesome
+            name={curtido ? "heart" : "heart-o"}
+            size={20}
+            color={curtido ? "#E91E63" : "#555"}
+          />
+          <Text style={estilos.textoAcao}>
+            {item.curtidas + (curtido ? 1 : 0)}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={estilos.botaoAcao}>
+          <FontAwesome name="comment-o" size={20} color="#555" />
+          <Text style={estilos.textoAcao}>{item.comentarios.length}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={estilos.botaoAcao}>
+          <FontAwesome name="share-square-o" size={20} color="#555" />
+          <Text style={estilos.textoAcao}>Compartilhar</Text>
+        </TouchableOpacity>
+      </View>
+
+      {item.comentarios.length > 0 && (
+        <View style={estilos.secaoComentarios}>
+          <FlatList
+            data={item.comentarios}
+            renderItem={({ item: comentario }) => (
+              <Comentario item={comentario} />
+            )}
+            keyExtractor={(comentario) => comentario.id}
+          />
+        </View>
+      )}
+    </View>
+  );
+}
+
+export default Post;
+
+const estilos = StyleSheet.create({
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cabecalhoPost: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  nomeAutor: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: "#888",
+  },
+  legenda: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 10,
+  },
+  imagemPost: {
+    width: width - 60,
+    height: 250,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  carousel: {
+    marginBottom: 10,
+  },
+  video: {
+    width: "100%",
+    height: 200,
+    marginBottom: 10,
+  },
+  enqueteContainer: {
+    marginTop: 10,
+  },
+  opcaoEnquete: {
+    backgroundColor: "#F0F0F0",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  textoOpcao: {
+    fontSize: 14,
+  },
+  votosOpcao: {
+    fontWeight: "bold",
+  },
+  rodapePost: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderTopWidth: 1,
+    borderTopColor: "#EEE",
+    paddingTop: 10,
+  },
+  botaoAcao: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  textoAcao: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#555",
+  },
+  secaoComentarios: {
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#EEE",
+    paddingTop: 10,
+  },
+});
