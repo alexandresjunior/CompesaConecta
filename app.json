@@ -41,6 +41,13 @@
           "cameraPermission": "O app precisa de acesso à sua câmera para você tirar fotos para suas publicações.",
           "microphonePermission": "O app precisa de acesso ao seu microfone para gravar áudios em vídeos."
         }
+      ],
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
       ]
     ],
     "experiments": {

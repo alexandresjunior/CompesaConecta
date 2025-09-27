@@ -1,17 +1,31 @@
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 function PostForm({ onSubmit, onCancel, isLoading }) {
     const [legenda, setLegenda] = useState('');
     const [tipoPublicacao, setTipoPublicacao] = useState('TEXTO');
-    const [midiaUri, setMidiaUri] = useState([]);
+    const [midiaItems, setMidiaItems] = useState([]);
     const [perguntaEnquete, setPerguntaEnquete] = useState('');
     const [opcoesEnquete, setOpcoesEnquete] = useState(['', '']);
 
+    const generateThumbnail = async (videoUri) => {
+        try {
+            const { uri } = await VideoThumbnails.getThumbnailAsync(
+                videoUri,
+                { time: 1500 }
+            );
+            return uri;
+        } catch (e) {
+            console.warn(e);
+            return null;
+        }
+    };
+
     const pickMedia = async (mediaType) => {
-        if (mediaType === 'imagem' && midiaUri.length >= 10) {
+        if (mediaType === 'imagem' && midiaItems.length >= 10) {
             Alert.alert('Limite Atingido', 'Você pode selecionar no máximo 10 imagens.');
             return;
         }
@@ -20,29 +34,30 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
             mediaTypes: mediaType === 'imagem' ? ['images'] : ['videos'],
             quality: 1,
             allowsMultipleSelection: mediaType === 'imagem',
-            selectionLimit: mediaType === 'imagem' ? (10 - midiaUri.length) : 1,
+            selectionLimit: mediaType === 'imagem' ? (10 - midiaItems.length) : 1,
         };
 
         let result = await ImagePicker.launchImageLibraryAsync(options);
 
         if (!result.canceled) {
             if (mediaType === 'imagem') {
-                const novosAssets = result.assets;
-                if (midiaUri.length + novosAssets.length > 10) {
-                    Alert.alert('Limite Atingido', `Você só pode adicionar mais ${10 - midiaUri.length} imagens. Apenas as primeiras foram selecionadas.`);
-                    const assetsPermitidos = novosAssets.slice(0, 10 - midiaUri.length);
-                    setMidiaUri([...midiaUri, ...assetsPermitidos.map(asset => asset.uri)]);
-                } else {
-                    setMidiaUri([...midiaUri, ...novosAssets.map(asset => asset.uri)]);
-                }
+                const novosAssets = result.assets.slice(0, 10 - midiaItems.length);
+                const novosItems = novosAssets.map(asset => ({ type: 'image', uri: asset.uri }));
+                setMidiaItems([...midiaItems, ...novosItems]);
             } else if (mediaType === 'video' && result.assets && result.assets.length > 0) {
-                setMidiaUri([result.assets[0].uri]);
+                const videoAsset = result.assets[0];
+                const thumbnailUri = await generateThumbnail(videoAsset.uri);
+                if (thumbnailUri) {
+                    setMidiaItems([{ type: 'video', uri: videoAsset.uri, thumbnailUri }]);
+                } else {
+                    Alert.alert("Erro", "Não foi possível gerar a miniatura do vídeo.");
+                }
             }
         }
     };
 
     const handleRemoveMedia = (uriToRemove) => {
-        setMidiaUri(midiaUri.filter(uri => uri !== uriToRemove));
+        setMidiaItems(midiaItems.filter(item => item.uri !== uriToRemove));
     };
 
     const handleAddOption = () => {
@@ -77,13 +92,13 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
         const novaPublicacao = { legenda, tipo: tipoPublicacao };
 
         if (tipoPublicacao === 'IMAGEM') {
-            if (midiaUri.length === 0) {
+            if (midiaItems.length === 0) {
                 Alert.alert('Erro', 'Por favor, selecione ao menos uma imagem.');
                 return;
             }
-            novaPublicacao.imagens = midiaUri;
+            novaPublicacao.imagens = midiaItems.map(item => item.uri);
         } else if (tipoPublicacao === 'VIDEO') {
-            if (midiaUri.length === 0) {
+            if (midiaItems.length === 0) {
                 Alert.alert('Erro', 'Por favor, selecione um vídeo.');
                 return;
             }
@@ -135,28 +150,28 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                 <View style={estilos.tipoSelector}>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'TEXTO' && estilos.tipoBotaoAtivo]}
-                        onPress={() => { setTipoPublicacao('TEXTO'); setMidiaUri([]); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        onPress={() => { setTipoPublicacao('TEXTO'); setMidiaItems([]); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
                         disabled={isLoading}
                     >
                         <FontAwesome name="text-width" size={25} color={tipoPublicacao === 'TEXTO' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'IMAGEM' && estilos.tipoBotaoAtivo]}
-                        onPress={() => { setTipoPublicacao('IMAGEM'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        onPress={() => { setTipoPublicacao('IMAGEM'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); setMidiaItems([]); }}
                         disabled={isLoading}
                     >
                         <FontAwesome name="image" size={25} color={tipoPublicacao === 'IMAGEM' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'VIDEO' && estilos.tipoBotaoAtivo]}
-                        onPress={() => { setTipoPublicacao('VIDEO'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        onPress={() => { setTipoPublicacao('VIDEO'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); setMidiaItems([]); }}
                         disabled={isLoading}
                     >
                         <FontAwesome name="video-camera" size={25} color={tipoPublicacao === 'VIDEO' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'ENQUETE' && estilos.tipoBotaoAtivo]}
-                        onPress={() => { setTipoPublicacao('ENQUETE'); setMidiaUri([]); }}
+                        onPress={() => { setTipoPublicacao('ENQUETE'); setMidiaItems([]); }}
                         disabled={isLoading}
                     >
                         <FontAwesome name="bar-chart" size={25} color={tipoPublicacao === 'ENQUETE' ? '#FFF' : '#333'} />
@@ -164,12 +179,39 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                 </View>
 
                 {(tipoPublicacao === 'IMAGEM' || tipoPublicacao === 'VIDEO') && (
-                    <TouchableOpacity style={estilos.botaoAnexo} onPress={() => pickMedia(tipoPublicacao === 'IMAGEM' ? 'imagem' : 'video')} disabled={isLoading}>
-                        <FontAwesome name="upload" size={20} color="#0D47A1" />
-                        <Text style={estilos.textoBotaoAnexo}>
-                            {tipoPublicacao === 'IMAGEM' ? `Selecionar Imagem(ns) (${midiaUri.length})` : `Selecionar Vídeo (${midiaUri.length})`}
-                        </Text>
-                    </TouchableOpacity>
+                    <View>
+                        <TouchableOpacity style={estilos.botaoAnexo} onPress={() => pickMedia(tipoPublicacao === 'IMAGEM' ? 'imagem' : 'video')} disabled={isLoading}>
+                            <FontAwesome name="upload" size={20} color="#0D47A1" />
+                            <Text style={estilos.textoBotaoAnexo}>
+                                {tipoPublicacao === 'IMAGEM' ? `Selecionar Imagem(ns) (${midiaItems.length}/10)` : `Selecionar Vídeo (${midiaItems.length}/1)`}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {midiaItems.length > 0 && (
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.previewScroll}>
+                                {midiaItems.map((item, index) => (
+                                    <View key={index} style={estilos.midiaPreviewContainer}>
+                                        <Image
+                                            source={{ uri: item.type === 'image' ? item.uri : item.thumbnailUri }}
+                                            style={estilos.previewImagem}
+                                        />
+                                        {item.type === 'video' && (
+                                            <View style={estilos.playIconContainer}>
+                                                <FontAwesome name="play-circle" size={40} color="rgba(255, 255, 255, 0.8)" />
+                                            </View>
+                                        )}
+                                        <TouchableOpacity
+                                            style={estilos.botaoRemoverMidia}
+                                            onPress={() => handleRemoveMedia(item.uri)}
+                                        >
+                                            <AntDesign name="close-circle" size={25} color="#D32F2F" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
+
                 )}
 
                 {tipoPublicacao === 'ENQUETE' && (
@@ -233,7 +275,7 @@ const estilos = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingBottom: 100,
     },
     titulo: {
         fontSize: 24,
@@ -370,5 +412,32 @@ const estilos = StyleSheet.create({
         color: '#FFF',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    previewScroll: {
+        paddingTop: 5,
+        paddingBottom: 20,
+    },
+    midiaPreviewContainer: {
+        position: 'relative',
+        marginRight: 10,
+        width: 120,
+        height: 120,
+    },
+    previewImagem: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+    },
+    previewVideo: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+    },
+    botaoRemoverMidia: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        backgroundColor: 'white',
+        borderRadius: 12,
     },
 });
