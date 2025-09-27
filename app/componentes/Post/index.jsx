@@ -1,21 +1,31 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { WebView } from "react-native-webview";
+import { router } from "expo-router";
+import { useState } from 'react';
+import { Alert, Dimensions, FlatList, Image, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import Comentario from "../Comentario";
 
 const { width } = Dimensions.get("window");
 
 function Post({ item }) {
   const [curtido, setCurtido] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Confira esta publicação no COMPESA Conecta:\n\n"${item.legenda}"\n\n(Link simulado: https://compesa-conecta.com.br/post/${item.id})`,
+      });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
+  const handleVerComentarios = () => {
+    router.push({
+      pathname: "/telas/Comentarios",
+      params: { post: JSON.stringify(item) }
+    });
+  };
 
   const renderConteudo = () => {
     switch (item.tipo) {
@@ -84,25 +94,16 @@ function Post({ item }) {
       {renderConteudo()}
 
       <View style={estilos.rodapePost}>
-        <TouchableOpacity
-          style={estilos.botaoAcao}
-          onPress={() => setCurtido(!curtido)}
-        >
-          <FontAwesome
-            name={curtido ? "heart" : "heart-o"}
-            size={20}
-            color={curtido ? "#E91E63" : "#555"}
-          />
-          <Text style={estilos.textoAcao}>
-            {item.curtidas + (curtido ? 1 : 0)}
-          </Text>
+        <TouchableOpacity style={estilos.botaoAcao} onPress={() => setCurtido(!curtido)}>
+          <FontAwesome name={curtido ? "heart" : "heart-o"} size={20} color={curtido ? "#E91E63" : "#555"} />
+          <Text style={estilos.textoAcao}>{item.curtidas + (curtido ? 1 : 0)}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={estilos.botaoAcao}>
+        <TouchableOpacity style={estilos.botaoAcao} onPress={handleVerComentarios}>
           <FontAwesome name="comment-o" size={20} color="#555" />
           <Text style={estilos.textoAcao}>{item.comentarios.length}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={estilos.botaoAcao}>
-          <FontAwesome name="share-square-o" size={20} color="#555" />
+        <TouchableOpacity style={estilos.botaoAcao} onPress={handleShare}>
+          <FontAwesome name="whatsapp" size={20} color="#25D366" />
           <Text style={estilos.textoAcao}>Compartilhar</Text>
         </TouchableOpacity>
       </View>
@@ -110,12 +111,15 @@ function Post({ item }) {
       {item.comentarios.length > 0 && (
         <View style={estilos.secaoComentarios}>
           <FlatList
-            data={item.comentarios}
-            renderItem={({ item: comentario }) => (
-              <Comentario item={comentario} />
-            )}
+            data={item.comentarios.slice(0, 2)}
+            renderItem={({ item: comentario }) => <Comentario item={comentario} />}
             keyExtractor={(comentario) => comentario.id}
           />
+          {item.comentarios.length > 2 && (
+            <TouchableOpacity onPress={handleVerComentarios}>
+              <Text style={estilos.verMais}>Ver todos os {item.comentarios.length} comentários</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>
@@ -211,7 +215,12 @@ const estilos = StyleSheet.create({
   secaoComentarios: {
     marginTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#EEE",
+    borderTopColor: '#EEE',
     paddingTop: 10,
+  },
+  verMais: {
+    color: '#0D47A1',
+    fontWeight: 'bold',
+    marginTop: 5,
   },
 });
