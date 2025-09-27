@@ -1,16 +1,36 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-function FaqItem({ titulo, children }) {
+import USUARIO_LOGADO from "../../mocks/usuarios";
+
+function FaqItem({ titulo, children, onRemove }) {
     const [aberto, setAberto] = useState(false);
+
+    const handleRemovePress = () => {
+        Alert.alert(
+            "Confirmar Remoção",
+            "Você tem certeza que deseja remover esta pergunta do FAQ?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                { text: "Remover", style: "destructive", onPress: onRemove }
+            ]
+        );
+    };
 
     return (
         <View style={estilos.accordionContainer}>
             <TouchableOpacity style={estilos.accordionHeader} onPress={() => setAberto(!aberto)}>
                 <View style={estilos.headerContent}>
                     <Text style={estilos.accordionTitle}>{titulo}</Text>
-                    <AntDesign name={aberto ? "caret-up" : "caret-down"} size={20} color={"#333"} />
+                    <View style={estilos.iconesContainer}>
+                        {USUARIO_LOGADO.nivel >= 3 && (
+                            <TouchableOpacity style={estilos.botaoRemoverFaq} onPress={handleRemovePress}>
+                                <FontAwesome name="trash-o" size={20} color="#D32F2F" />
+                            </TouchableOpacity>
+                        )}
+                        <AntDesign name={aberto ? "caret-up" : "caret-down"} size={20} color={"#333"} />
+                    </View>
                 </View>
             </TouchableOpacity>
             {aberto && <View style={estilos.accordionContent}>{children}</View>}
@@ -54,5 +74,13 @@ const estilos = StyleSheet.create({
         paddingHorizontal: 20,
         borderTopWidth: 1,
         borderTopColor: '#E0E0E0'
+    },
+    iconesContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    botaoRemoverFaq: {
+        marginRight: 15,
+        padding: 5,
     },
 });

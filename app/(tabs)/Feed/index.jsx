@@ -1,10 +1,10 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Post from "../../componentes/Post";
-import { listarPublicacoes } from '../../servicos/publicacoes';
+import { listarPublicacoes, removerPublicacao } from '../../servicos/publicacoes';
 
 const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo_horizontal.png');
 
@@ -12,6 +12,17 @@ function Feed() {
   const [publicacoes, setPublicacoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const insets = useSafeAreaInsets();
+
+  const handleRemoverPost = async (postId) => {
+    try {
+      await removerPublicacao(postId);
+      setPublicacoes(publicacoesAtuais => publicacoesAtuais.filter(p => p.id !== postId));
+      Alert.alert("Sucesso", "Publicação removida.");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível remover a publicação.");
+      console.error(error);
+    }
+  };
 
   const carregarPublicacoesDoFeed = useCallback(async () => {
     setCarregando(true);
@@ -53,7 +64,7 @@ function Feed() {
 
       <FlatList
         data={publicacoes}
-        renderItem={({ item }) => <Post item={item} />}
+        renderItem={({ item }) => <Post item={item} onRemove={handleRemoverPost} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={estilos.listContainer}
         showsVerticalScrollIndicator={false}

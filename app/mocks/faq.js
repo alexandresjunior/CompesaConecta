@@ -47,3 +47,17 @@ export function adicionarFaqMock(novaFaq) {
         }, 300);
     });
 }
+
+export function removerFaqMock(faqId) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const index = LISTA_FAQ.findIndex(f => f.id === faqId);
+            if (index > -1) {
+                LISTA_FAQ.splice(index, 1);
+                resolve({ sucesso: true });
+            } else {
+                reject(new Error('FAQ não encontrado.'));
+            }
+        }, 500);
+    });
+}

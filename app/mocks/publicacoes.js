@@ -138,3 +138,17 @@ export function removerComentarioMock(postId, comentarioId) {
     }, 300);
   });
 }
+
+export function removerPublicacaoMock(postId) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const index = LISTA_PUBLICACOES.findIndex(p => p.id === postId);
+      if (index > -1) {
+        LISTA_PUBLICACOES.splice(index, 1);
+        resolve({ sucesso: true });
+      } else {
+        reject(new Error('Publicação não encontrada.'));
+      }
+    }, 500);
+  });
+}

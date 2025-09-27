@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, Image, ScrollView, StatusBar, StyleSheet, Tex
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FaqItem from '../../componentes/FaqItem';
 import USUARIO_LOGADO from '../../mocks/usuarios';
-import { adicionarFaq, buscarFaq } from '../../servicos/faq';
+import { adicionarFaq, buscarFaq, removerFaq } from '../../servicos/faq';
 
 const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo_horizontal.png');
 
@@ -16,6 +16,17 @@ function Faq() {
     const [novaPergunta, setNovaPergunta] = useState('');
     const [novaResposta, setNovaResposta] = useState('');
     const [enviandoFaq, setEnviandoFaq] = useState(false);
+
+    const handleRemoverFaq = async (faqId) => {
+        try {
+            await removerFaq(faqId);
+            setFaq(faqAtual => faqAtual.filter(item => item.id !== faqId));
+            Alert.alert("Sucesso", "Pergunta removida do FAQ.");
+        } catch (error) {
+            Alert.alert("Erro", "Não foi possível remover a pergunta.");
+            console.error(error);
+        }
+    };
 
     const carregarFaqLista = useCallback(async () => {
         setCarregando(true);
@@ -122,7 +133,11 @@ function Faq() {
                 )}
 
                 {faq.map(item => (
-                    <FaqItem key={item.id} titulo={item.pergunta}>
+                    <FaqItem
+                        key={item.id}
+                        titulo={item.pergunta}
+                        onRemove={() => handleRemoverFaq(item.id)}
+                    >
                         <Text style={estilos.resposta}>{item.resposta}</Text>
                     </FaqItem>
                 ))}

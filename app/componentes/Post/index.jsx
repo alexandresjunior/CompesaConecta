@@ -5,9 +5,11 @@ import { Alert, Dimensions, FlatList, Image, Share, StyleSheet, Text, TouchableO
 import { WebView } from 'react-native-webview';
 import Comentario from "../Comentario";
 
+import USUARIO_LOGADO from '../../mocks/usuarios';
+
 const { width } = Dimensions.get("window");
 
-function Post({ item }) {
+function Post({ item, onRemove }) {
   const [curtido, setCurtido] = useState(false);
 
   const handleShare = async () => {
@@ -18,6 +20,17 @@ function Post({ item }) {
     } catch (error) {
       Alert.alert(error.message);
     }
+  };
+
+  const handleRemovePress = () => {
+    Alert.alert(
+      "Confirmar Remoção",
+      "Você tem certeza que deseja remover esta publicação? Esta ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Remover", style: "destructive", onPress: () => onRemove(item.id) }
+      ]
+    );
   };
 
   const handleVerComentarios = () => {
@@ -82,12 +95,16 @@ function Post({ item }) {
     <View style={estilos.card}>
       <View style={estilos.cabecalhoPost}>
         <Image source={{ uri: item.autor.avatar }} style={estilos.avatar} />
-        <View>
+        <View style={estilos.infoAutor}>
           <Text style={estilos.nomeAutor}>{item.autor.nome}</Text>
-          <Text style={estilos.timestamp}>
-            {new Date(item.timestamp).toLocaleDateString("pt-BR")}
-          </Text>
+          <Text style={estilos.timestamp}>{new Date(item.timestamp).toLocaleDateString('pt-BR')}</Text>
         </View>
+        {/* Botão de Remover Post */}
+        {USUARIO_LOGADO.nivel >= 3 && (
+          <TouchableOpacity style={estilos.botaoRemoverPost} onPress={handleRemovePress}>
+            <FontAwesome name="trash-o" size={22} color="#D32F2F" />
+          </TouchableOpacity>
+        )}
       </View>
       <Text style={estilos.legenda}>{item.legenda}</Text>
 
@@ -222,5 +239,12 @@ const estilos = StyleSheet.create({
     color: '#0D47A1',
     fontWeight: 'bold',
     marginTop: 5,
+  },
+  infoAutor: {
+    flex: 1,
+  },
+  botaoRemoverPost: {
+    padding: 5,
+    marginLeft: 10,
   },
 });
