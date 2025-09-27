@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import autenticarUsuario from "../../servicos/login";
+import { registerForPushNotificationsAsync } from '../../servicos/notifications';
 
 const BACKGROUND_IMAGEM = require('../../../assets/images/background.png');
 const LOGO_COMPESA = require('../../../assets/images/compesa-logo.png');
@@ -43,6 +44,9 @@ function Login() {
           console.error("Erro ao salvar o estado de 'manter conectado':", e);
         }
       }
+
+      await registerForPushNotificationsAsync();
+
       router.replace("/(tabs)/Feed");
     }
   };
