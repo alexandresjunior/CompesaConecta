@@ -11,19 +11,38 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
     const [opcoesEnquete, setOpcoesEnquete] = useState(['', '']);
 
     const pickMedia = async (mediaType) => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: mediaType === 'imagem' ? ImagePicker.MediaTypeOptions.Images : ImagePicker.MediaTypeOptions.Videos,
-            allowsMultipleSelection: mediaType === 'imagem',
+        if (mediaType === 'imagem' && midiaUri.length >= 10) {
+            Alert.alert('Limite Atingido', 'Você pode selecionar no máximo 10 imagens.');
+            return;
+        }
+
+        const options = {
+            mediaTypes: mediaType === 'imagem' ? ['images'] : ['videos'],
             quality: 1,
-        });
+            allowsMultipleSelection: mediaType === 'imagem',
+            selectionLimit: mediaType === 'imagem' ? (10 - midiaUri.length) : 1,
+        };
+
+        let result = await ImagePicker.launchImageLibraryAsync(options);
 
         if (!result.canceled) {
-            if (mediaType === 'imagem' && result.assets) {
-                setMidiaUri(result.assets.map(asset => asset.uri));
+            if (mediaType === 'imagem') {
+                const novosAssets = result.assets;
+                if (midiaUri.length + novosAssets.length > 10) {
+                    Alert.alert('Limite Atingido', `Você só pode adicionar mais ${10 - midiaUri.length} imagens. Apenas as primeiras foram selecionadas.`);
+                    const assetsPermitidos = novosAssets.slice(0, 10 - midiaUri.length);
+                    setMidiaUri([...midiaUri, ...assetsPermitidos.map(asset => asset.uri)]);
+                } else {
+                    setMidiaUri([...midiaUri, ...novosAssets.map(asset => asset.uri)]);
+                }
             } else if (mediaType === 'video' && result.assets && result.assets.length > 0) {
                 setMidiaUri([result.assets[0].uri]);
             }
         }
+    };
+
+    const handleRemoveMedia = (uriToRemove) => {
+        setMidiaUri(midiaUri.filter(uri => uri !== uriToRemove));
     };
 
     const handleAddOption = () => {
