@@ -2,18 +2,17 @@ import { useRouter } from "expo-router";
 import { Image, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import autenticarUsuario from "../../servicos/login";
 
-// Caminhos das imagens
 const BACKGROUND_IMAGEM = require('../../../assets/images/background.png');
-const LOGO_COMPESA = require('../../../assets/images/compesa-logo.png'); // Logo da COMPESA institucional (ainda no rodapé)
-const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo.png'); // NOVA: Logomarca do aplicativo
+const LOGO_COMPESA = require('../../../assets/images/compesa-logo.png');
+const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo.png');
 
 function Login() {
   const router = useRouter();
 
   const handleLoginPress = async () => {
-    const resposta = await autenticarUsuario("user", "pass"); // Simula chamada
+    const resposta = await autenticarUsuario("user", "pass");
     if (resposta.sucesso) {
-      router.push("/telas/Feed");
+      router.push("/(tabs)/Feed");
     }
   }
 
@@ -28,7 +27,6 @@ function Login() {
         style={estilos.container}
       >
         <View style={estilos.formulario}>
-          {/* Substituído o Text pelo Image com a logomarca do app */}
           <Image source={LOGO_COMPESA_CONECTA} style={estilos.logoApp} />
 
           <Text style={estilos.subtitulo}>
@@ -93,13 +91,12 @@ const estilos = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 8
   },
-  // Removido o estilo 'titulo' pois não será mais um Text
   subtitulo: {
     fontSize: 16,
     color: '#555',
     textAlign: 'center',
     marginBottom: 24,
-    marginTop: 15, // Adicionado um espaçamento para a logo do app
+    marginTop: 15,
   },
   input: {
     width: '100%',

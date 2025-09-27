@@ -5,7 +5,7 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="telas/Login/index" />
       <Stack.Screen name="telas/Comentarios/index" />
-      <Stack.Screen name="telas/_layout" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
 }
