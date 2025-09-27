@@ -1,7 +1,20 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Comentario from "../../componentes/Comentario";
 import USUARIO_LOGADO from "../../mocks/usuarios";
@@ -109,28 +122,33 @@ function Comentarios() {
                 )}
             />
 
-            <View style={estilos.novoComentarioContainer}>
-                <TextInput
-                    style={estilos.inputComentario}
-                    placeholder="Adicione um comentário..."
-                    placeholderTextColor="#666"
-                    value={novoComentarioTexto}
-                    onChangeText={setNovoComentarioTexto}
-                    multiline
-                    editable={!enviandoComentario}
-                />
-                <TouchableOpacity
-                    style={estilos.botaoEnviarComentario}
-                    onPress={handleAdicionarComentario}
-                    disabled={enviandoComentario || !novoComentarioTexto.trim()}
-                >
-                    {enviandoComentario ? (
-                        <ActivityIndicator color="#FFF" />
-                    ) : (
-                        <FontAwesome name="send" size={20} color="#FFF" />
-                    )}
-                </TouchableOpacity>
-            </View>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+            >
+                <View style={estilos.novoComentarioContainer}>
+                    <TextInput
+                        style={estilos.inputComentario}
+                        placeholder="Adicione um comentário..."
+                        placeholderTextColor="#666"
+                        value={novoComentarioTexto}
+                        onChangeText={setNovoComentarioTexto}
+                        multiline
+                        editable={!enviandoComentario}
+                    />
+                    <TouchableOpacity
+                        style={estilos.botaoEnviarComentario}
+                        onPress={handleAdicionarComentario}
+                        disabled={enviandoComentario || !novoComentarioTexto.trim()}
+                    >
+                        {enviandoComentario ? (
+                            <ActivityIndicator color="#FFF" />
+                        ) : (
+                            <FontAwesome name="send" size={20} color="#FFF" />
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
