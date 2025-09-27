@@ -103,7 +103,7 @@ function Faq() {
                         <TextInput
                             style={estilos.input}
                             placeholder="Nova Pergunta"
-                            placeholderTextColor="#666"
+                            placeholderTextColor="#999"
                             value={novaPergunta}
                             onChangeText={setNovaPergunta}
                             editable={!enviandoFaq}
@@ -111,7 +111,7 @@ function Faq() {
                         <TextInput
                             style={[estilos.input, estilos.textArea]}
                             placeholder="Resposta"
-                            placeholderTextColor="#666"
+                            placeholderTextColor="#999"
                             value={novaResposta}
                             onChangeText={setNovaResposta}
                             multiline

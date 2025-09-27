@@ -130,7 +130,7 @@ function Comentarios() {
                     <TextInput
                         style={estilos.inputComentario}
                         placeholder="Adicione um comentário..."
-                        placeholderTextColor="#666"
+                        placeholderTextColor="#999"
                         value={novoComentarioTexto}
                         onChangeText={setNovoComentarioTexto}
                         multiline

@@ -140,7 +140,7 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                 <TextInput
                     style={[estilos.input, estilos.textArea]}
                     placeholder="O que você deseja compartilhar?"
-                    placeholderTextColor="#666"
+                    placeholderTextColor="#999"
                     value={legenda}
                     onChangeText={setLegenda}
                     multiline
@@ -219,7 +219,7 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                         <TextInput
                             style={estilos.input}
                             placeholder="Pergunta da enquete"
-                            placeholderTextColor="#666"
+                            placeholderTextColor="#999"
                             value={perguntaEnquete}
                             onChangeText={setPerguntaEnquete}
                             disabled={isLoading}
@@ -229,7 +229,7 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                                 <TextInput
                                     style={[estilos.input, estilos.opcaoInput]}
                                     placeholder={`Opção ${index + 1}`}
-                                    placeholderTextColor="#666"
+                                    placeholderTextColor="#999"
                                     value={opcao}
                                     onChangeText={(text) => handleOptionChange(text, index)}
                                     disabled={isLoading}
@@ -384,12 +384,11 @@ const estilos = StyleSheet.create({
     },
     footer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
     },
     botaoAcaoSecundario: {
         flex: 1,
         paddingVertical: 12,
-        paddingHorizontal: 20,
         borderRadius: 8,
         backgroundColor: '#E0E0E0',
         alignItems: 'center',
@@ -402,10 +401,8 @@ const estilos = StyleSheet.create({
     botaoAcaoPrincipal: {
         flex: 1,
         paddingVertical: 12,
-        paddingHorizontal: 20,
         borderRadius: 8,
         backgroundColor: '#0D47A1',
-        minWidth: 100,
         alignItems: 'center',
     },
     textoBotaoAcaoPrincipal: {

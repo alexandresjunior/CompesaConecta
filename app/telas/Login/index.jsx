@@ -1,5 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Checkbox } from 'expo-checkbox';
 import { useRouter } from "expo-router";
-import { Image, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Image, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import autenticarUsuario from "../../servicos/login";
 
 const BACKGROUND_IMAGEM = require('../../../assets/images/background.png');
@@ -9,11 +12,47 @@ const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_log
 function Login() {
   const router = useRouter();
 
+  const [manterConectado, setManterConectado] = useState(false);
+  const [verificandoLogin, setVerificandoLogin] = useState(true);
+
+  useEffect(() => {
+    const verificarStatusLogin = async () => {
+      try {
+        const usuarioLogado = await AsyncStorage.getItem('@COMPESA_CONECTA:userLoggedIn');
+        if (usuarioLogado === 'true') {
+          router.replace('/(tabs)/Feed');
+        } else {
+          setVerificandoLogin(false);
+        }
+      } catch (e) {
+        console.error("Erro ao verificar status de login:", e);
+        setVerificandoLogin(false);
+      }
+    };
+
+    verificarStatusLogin();
+  });
+
   const handleLoginPress = async () => {
     const resposta = await autenticarUsuario("user", "pass");
     if (resposta.sucesso) {
-      router.push("/(tabs)/Feed");
+      if (manterConectado) {
+        try {
+          await AsyncStorage.setItem('@COMPESA_CONECTA:userLoggedIn', 'true');
+        } catch (e) {
+          console.error("Erro ao salvar o estado de 'manter conectado':", e);
+        }
+      }
+      router.replace("/(tabs)/Feed");
     }
+  };
+
+  if (verificandoLogin) {
+    return (
+      <View style={estilos.loadingContainer}>
+        <ActivityIndicator size="large" color="#0D47A1" />
+      </View>
+    );
   }
 
   return (
@@ -47,6 +86,16 @@ function Login() {
             secureTextEntry
           />
 
+          <View style={estilos.checkboxContainer}>
+            <Checkbox
+              style={estilos.checkbox}
+              value={manterConectado}
+              onValueChange={setManterConectado}
+              color={manterConectado ? '#0D47A1' : undefined}
+            />
+            <Text style={estilos.checkboxLabel}>Mantenha-me conectado</Text>
+          </View>
+
           <TouchableOpacity
             style={estilos.botao}
             onPress={handleLoginPress}
@@ -64,6 +113,12 @@ function Login() {
 export default Login;
 
 const estilos = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F4F6F8'
+  },
   background: {
     flex: 1,
     width: '100%',
@@ -136,5 +191,21 @@ const estilos = StyleSheet.create({
     width: 300,
     height: 100,
     resizeMode: 'contain',
-  }
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+    justifyContent: 'flex-start',
+  },
+  checkbox: {
+    marginRight: 8,
+    borderRadius: 5,
+    borderColor: '#0D47A1'
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: '#555',
+  },
 });
