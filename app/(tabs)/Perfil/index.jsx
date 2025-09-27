@@ -23,11 +23,11 @@ function Perfil() {
                 <Text style={estilos.nomeUsuario}>{USUARIO_LOGADO.nome}</Text>
                 <Text style={estilos.emailUsuario}>usuario.logado@compesa.com.br</Text>
                 <Text style={estilos.nivelAcesso}>Nível de Acesso: {USUARIO_LOGADO.nivel}</Text>
-
-                <TouchableOpacity style={estilos.botaoSair} onPress={handleLogout}>
-                    <Text style={estilos.textoBotaoSair}>Sair</Text>
-                </TouchableOpacity>
             </View>
+
+            <TouchableOpacity style={estilos.botaoSair} onPress={handleLogout}>
+                <Text style={estilos.textoBotaoSair}>Sair</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 }
@@ -77,11 +77,11 @@ const estilos = StyleSheet.create({
         fontStyle: 'italic',
     },
     botaoSair: {
+        marginHorizontal: 20,
+        alignItems: 'center',
+        padding: 20,
         backgroundColor: '#D32F2F',
-        paddingVertical: 12,
-        paddingHorizontal: 30,
         borderRadius: 10,
-        marginTop: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
