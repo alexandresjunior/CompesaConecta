@@ -26,7 +26,7 @@ function Perfil() {
             </View>
 
             <TouchableOpacity style={estilos.botaoSair} onPress={handleLogout}>
-                <Text style={estilos.textoBotaoSair}>Sair</Text>
+                <Text style={estilos.textoBotaoSair}>SAIR</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );
@@ -90,7 +90,7 @@ const estilos = StyleSheet.create({
     },
     textoBotaoSair: {
         color: '#FFFFFF',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
