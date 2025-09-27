@@ -46,7 +46,7 @@ function Feed() {
     return (
       <View style={[estilos.centerContainer, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color="#0D47A1" />
-        <Text>Carregando publicações...</Text>
+        <Text style={{ paddingTop: 15 }}>Carregando publicações...</Text>
       </View>
     );
   }
