@@ -98,20 +98,21 @@ function Post({ item, onRemove }) {
           />
         );
       case "ENQUETE":
-        const totalVotos = item.enquete.opcoes.reduce(
-          (acc, op) => acc + op.votos,
-          0
-        );
+        const totalVotos = item.enquete.opcoes.reduce((acc, op) => acc + op.votos, 0) || 1;
         return (
           <View style={estilos.enqueteContainer}>
-            {item.enquete.opcoes.map((opcao) => (
-              <TouchableOpacity key={opcao.id} style={estilos.opcaoEnquete}>
-                <Text style={estilos.textoOpcao}>{opcao.texto}</Text>
-                <Text style={estilos.votosOpcao}>
-                  {((opcao.votos / totalVotos) * 100).toFixed(0)}%
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {item.enquete.opcoes.map((opcao) => {
+              const porcentagem = ((opcao.votos / totalVotos) * 100).toFixed(0);
+              return (
+                <TouchableOpacity key={opcao.id} style={estilos.opcaoEnquete}>
+                  <View style={[estilos.barraProgresso, { width: `${porcentagem}%` }]} />
+                  <View style={estilos.conteudoOpcao}>
+                    <Text style={estilos.textoOpcao}>{opcao.texto}</Text>
+                    <Text style={estilos.votosOpcao}>{porcentagem}%</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         );
       default:
@@ -244,19 +245,33 @@ const estilos = StyleSheet.create({
     marginTop: 10,
   },
   opcaoEnquete: {
-    backgroundColor: "#F0F0F0",
-    padding: 12,
+    backgroundColor: "#E0E0E0",
     borderRadius: 8,
     marginBottom: 8,
+    justifyContent: "center",
+    overflow: 'hidden',
+  },
+  barraProgresso: {
+    backgroundColor: 'rgba(13, 71, 161, 0.25)',
+    height: '100%',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
+  conteudoOpcao: {
+    padding: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: 'transparent',
   },
   textoOpcao: {
     fontSize: 14,
+    color: '#000',
   },
   votosOpcao: {
     fontWeight: "bold",
+    color: '#000',
   },
   rodapePost: {
     flexDirection: "row",
