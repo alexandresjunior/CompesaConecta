@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,7 +7,9 @@ import USUARIO_LOGADO from "../../mocks/usuarios";
 const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo_horizontal.png');
 
 function Perfil() {
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        await AsyncStorage.clear();
+        
         router.replace('/telas/Login');
     };
 
