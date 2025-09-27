@@ -1,0 +1,351 @@
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+function PostForm({ onSubmit, onCancel, isLoading }) {
+    const [legenda, setLegenda] = useState('');
+    const [tipoPublicacao, setTipoPublicacao] = useState('TEXTO');
+    const [midiaUri, setMidiaUri] = useState([]);
+    const [perguntaEnquete, setPerguntaEnquete] = useState('');
+    const [opcoesEnquete, setOpcoesEnquete] = useState(['', '']);
+
+    const pickMedia = async (mediaType) => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: mediaType === 'imagem' ? ImagePicker.MediaTypeOptions.Images : ImagePicker.MediaTypeOptions.Videos,
+            allowsMultipleSelection: mediaType === 'imagem',
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            if (mediaType === 'imagem' && result.assets) {
+                setMidiaUri(result.assets.map(asset => asset.uri));
+            } else if (mediaType === 'video' && result.assets && result.assets.length > 0) {
+                setMidiaUri([result.assets[0].uri]);
+            }
+        }
+    };
+
+    const handleAddOption = () => {
+        setOpcoesEnquete([...opcoesEnquete, '']);
+    };
+
+    const handleOptionChange = (text, index) => {
+        const newOptions = [...opcoesEnquete];
+        newOptions[index] = text;
+        setOpcoesEnquete(newOptions);
+    };
+
+    const handleRemoveOption = (index) => {
+        const newOptions = [...opcoesEnquete];
+        newOptions.splice(index, 1);
+        setOpcoesEnquete(newOptions);
+    };
+
+    const handleSubmit = () => {
+        if (!legenda.trim() && tipoPublicacao === 'TEXTO') {
+            Alert.alert('Erro', 'Por favor, insira uma legenda para a publicação.');
+            return;
+        }
+
+        const novaPublicacao = { legenda, tipo: tipoPublicacao };
+
+        if (tipoPublicacao === 'IMAGEM') {
+            if (midiaUri.length === 0) {
+                Alert.alert('Erro', 'Por favor, selecione ao menos uma imagem.');
+                return;
+            }
+            novaPublicacao.imagens = midiaUri;
+        } else if (tipoPublicacao === 'VIDEO') {
+            if (midiaUri.length === 0) {
+                Alert.alert('Erro', 'Por favor, selecione um vídeo.');
+                return;
+            }
+            // Para simulação, precisamos de um link do YouTube.
+            // Para um app real, o vídeo seria carregado e depois teríamos um link para ele.
+            // Aqui, vamos apenas usar o URI selecionado como um "placeholder" ou pedir um URL.
+            // Para o mock, estamos pedindo um URL direto do YouTube.
+            Alert.alert('Aviso', 'Para vídeos, o mock simula um link do YouTube. No app real, o vídeo seria enviado e um link gerado.');
+            const youtubeUrl = prompt('Insira o URL do vídeo do YouTube (ex: https://www.youtube.com/watch?v=...)');
+            if (!youtubeUrl) {
+                return;
+            }
+            novaPublicacao.videoUrl = youtubeUrl;
+        } else if (tipoPublicacao === 'ENQUETE') {
+            if (!perguntaEnquete.trim()) {
+                Alert.alert('Erro', 'Por favor, insira a pergunta da enquete.');
+                return;
+            }
+            const opcoesValidas = opcoesEnquete.filter(opt => opt.trim() !== '');
+            if (opcoesValidas.length < 2) {
+                Alert.alert('Erro', 'Uma enquete deve ter ao menos duas opções.');
+                return;
+            }
+            novaPublicacao.enquete = {
+                pergunta: perguntaEnquete,
+                opcoes: opcoesValidas.map(texto => ({ texto, votos: 0 }))
+            };
+        }
+
+        onSubmit(novaPublicacao);
+    };
+
+
+    return (
+        <View style={estilos.container}>
+            <ScrollView contentContainerStyle={estilos.scrollContent}>
+                <Text style={estilos.titulo}>Criar Nova Publicação</Text>
+
+                <TextInput
+                    style={[estilos.input, estilos.textArea]}
+                    placeholder="O que você quer compartilhar? (Legenda)"
+                    value={legenda}
+                    onChangeText={setLegenda}
+                    multiline
+                    numberOfLines={4}
+                />
+
+                <View style={estilos.tipoSelector}>
+                    <TouchableOpacity
+                        style={[estilos.tipoBotao, tipoPublicacao === 'TEXTO' && estilos.tipoBotaoAtivo]}
+                        onPress={() => { setTipoPublicacao('TEXTO'); setMidiaUri([]); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        disabled={isLoading}
+                    >
+                        <FontAwesome name="text-width" size={20} color={tipoPublicacao === 'TEXTO' ? '#FFF' : '#333'} />
+                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'TEXTO' && estilos.tipoTextoAtivo]}>Texto</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[estilos.tipoBotao, tipoPublicacao === 'IMAGEM' && estilos.tipoBotaoAtivo]}
+                        onPress={() => { setTipoPublicacao('IMAGEM'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        disabled={isLoading}
+                    >
+                        <FontAwesome name="image" size={20} color={tipoPublicacao === 'IMAGEM' ? '#FFF' : '#333'} />
+                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'IMAGEM' && estilos.tipoTextoAtivo]}>Imagem</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[estilos.tipoBotao, tipoPublicacao === 'VIDEO' && estilos.tipoBotaoAtivo]}
+                        onPress={() => { setTipoPublicacao('VIDEO'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
+                        disabled={isLoading}
+                    >
+                        <FontAwesome name="video-camera" size={20} color={tipoPublicacao === 'VIDEO' ? '#FFF' : '#333'} />
+                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'VIDEO' && estilos.tipoTextoAtivo]}>Vídeo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[estilos.tipoBotao, tipoPublicacao === 'ENQUETE' && estilos.tipoBotaoAtivo]}
+                        onPress={() => { setTipoPublicacao('ENQUETE'); setMidiaUri([]); }}
+                        disabled={isLoading}
+                    >
+                        <FontAwesome name="bar-chart" size={20} color={tipoPublicacao === 'ENQUETE' ? '#FFF' : '#333'} />
+                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'ENQUETE' && estilos.tipoTextoAtivo]}>Enquete</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {(tipoPublicacao === 'IMAGEM' || tipoPublicacao === 'VIDEO') && (
+                    <TouchableOpacity style={estilos.botaoAnexo} onPress={() => pickMedia(tipoPublicacao === 'IMAGEM' ? 'imagem' : 'video')} disabled={isLoading}>
+                        <FontAwesome name="upload" size={20} color="#0D47A1" />
+                        <Text style={estilos.textoBotaoAnexo}>
+                            {tipoPublicacao === 'IMAGEM' ? `Selecionar Imagem(ns) (${midiaUri.length})` : `Selecionar Vídeo (${midiaUri.length})`}
+                        </Text>
+                    </TouchableOpacity>
+                )}
+
+                {tipoPublicacao === 'ENQUETE' && (
+                    <View style={estilos.enqueteSection}>
+                        <TextInput
+                            style={estilos.input}
+                            placeholder="Pergunta da enquete"
+                            value={perguntaEnquete}
+                            onChangeText={setPerguntaEnquete}
+                            disabled={isLoading}
+                        />
+                        {opcoesEnquete.map((opcao, index) => (
+                            <View key={index} style={estilos.opcaoInputContainer}>
+                                <TextInput
+                                    style={[estilos.input, estilos.opcaoInput]}
+                                    placeholder={`Opção ${index + 1}`}
+                                    value={opcao}
+                                    onChangeText={(text) => handleOptionChange(text, index)}
+                                    disabled={isLoading}
+                                />
+                                {opcoesEnquete.length > 2 && (
+                                    <TouchableOpacity onPress={() => handleRemoveOption(index)} style={estilos.removerOpcaoBtn} disabled={isLoading}>
+                                        <AntDesign name="minuscircleo" size={20} color="#D32F2F" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        ))}
+                        <TouchableOpacity style={estilos.botaoAddOpcao} onPress={handleAddOption} disabled={isLoading}>
+                            <AntDesign name="pluscircleo" size={20} color="#0D47A1" />
+                            <Text style={estilos.textoAddOpcao}>Adicionar Opção</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </ScrollView>
+
+            <View style={estilos.footer}>
+                <TouchableOpacity style={[estilos.botaoAcaoSecundario, { marginRight: 10 }]} onPress={onCancel} disabled={isLoading}>
+                    <Text style={estilos.textoBotaoAcaoSecundario}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={estilos.botaoAcaoPrincipal} onPress={handleSubmit} disabled={isLoading}>
+                    {isLoading ? (
+                        <ActivityIndicator color="#FFF" />
+                    ) : (
+                        <Text style={estilos.textoBotaoAcaoPrincipal}>Publicar</Text>
+                    )}
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+}
+
+export default PostForm;
+
+const estilos = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F4F6F8',
+        paddingTop: 10,
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+    },
+    titulo: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1A237E',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    input: {
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        padding: 15,
+        fontSize: 16,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        marginBottom: 15,
+    },
+    textArea: {
+        height: 120,
+        textAlignVertical: 'top',
+    },
+    tipoSelector: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 20,
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        paddingVertical: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    tipoBotao: {
+        padding: 10,
+        borderRadius: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    tipoBotaoAtivo: {
+        backgroundColor: '#0D47A1',
+    },
+    tipoTexto: {
+        marginLeft: 5,
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    tipoTextoAtivo: {
+        color: '#FFF',
+    },
+    botaoAnexo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#E3F2FD',
+        padding: 15,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#90CAF9',
+        marginBottom: 20,
+    },
+    textoBotaoAnexo: {
+        marginLeft: 10,
+        color: '#0D47A1',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    enqueteSection: {
+        marginTop: 10,
+        backgroundColor: '#FFF',
+        padding: 15,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        marginBottom: 20,
+    },
+    opcaoInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    opcaoInput: {
+        flex: 1,
+        marginBottom: 0,
+        marginRight: 10,
+    },
+    removerOpcaoBtn: {
+        padding: 5,
+    },
+    botaoAddOpcao: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#E8F5E9',
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#A5D6A7',
+        marginTop: 10,
+    },
+    textoAddOpcao: {
+        marginLeft: 10,
+        color: '#2E7D32',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        padding: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        backgroundColor: '#FFF',
+    },
+    botaoAcaoSecundario: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        backgroundColor: '#E0E0E0',
+    },
+    textoBotaoAcaoSecundario: {
+        color: '#333',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    botaoAcaoPrincipal: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        backgroundColor: '#0D47A1',
+        minWidth: 100,
+        alignItems: 'center',
+    },
+    textoBotaoAcaoPrincipal: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+});

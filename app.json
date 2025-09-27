@@ -33,6 +33,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O app precisa de acesso às suas fotos para você escolher imagens para suas publicações.",
+          "cameraPermission": "O app precisa de acesso à sua câmera para você tirar fotos para suas publicações.",
+          "microphonePermission": "O app precisa de acesso ao seu microfone para gravar áudios em vídeos."
+        }
       ]
     ],
     "experiments": {

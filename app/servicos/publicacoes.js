@@ -1,9 +1,17 @@
-import LISTA_PUBLICACOES from "../mocks/publicacoes";
+import { adicionarComentarioMock, adicionarPublicacaoMock, listarPublicacoesMock, removerComentarioMock } from "../mocks/publicacoes";
 
-export default function listarPublicacoes() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(LISTA_PUBLICACOES);
-    }, 1500);
-  });
+export function listarPublicacoes() {
+  return listarPublicacoesMock();
+}
+
+export function criarPublicacao(novaPublicacao) {
+  return adicionarPublicacaoMock(novaPublicacao);
+}
+
+export function adicionarComentario(postId, textoComentario) {
+  return adicionarComentarioMock(postId, textoComentario);
+}
+
+export function removerComentario(postId, comentarioId) {
+  return removerComentarioMock(postId, comentarioId);
 }

@@ -1,9 +1,9 @@
-import LISTA_FAQ from "../mocks/faq";
+import { adicionarFaqMock, buscarFaqMock } from "../mocks/faq";
 
-export default function buscarFaq() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(LISTA_FAQ);
-        }, 500);
-    });
+export function buscarFaq() {
+    return buscarFaqMock();
+}
+
+export function adicionarFaq(novaFaq) {
+    return adicionarFaqMock(novaFaq);
 }

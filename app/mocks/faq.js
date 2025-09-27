@@ -1,4 +1,4 @@
-const LISTA_FAQ = [
+let LISTA_FAQ = [
     {
         id: '1',
         pergunta: 'O que é o COMPESA Conecta?',
@@ -26,4 +26,24 @@ const LISTA_FAQ = [
     },
 ];
 
-export default LISTA_FAQ;
+export function buscarFaqMock() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve([...LISTA_FAQ]);
+        }, 500);
+    });
+}
+
+export function adicionarFaqMock(novaFaq) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const id = (LISTA_FAQ.length + 1).toString();
+            const faqItem = {
+                id,
+                ...novaFaq
+            };
+            LISTA_FAQ.push(faqItem);
+            resolve(faqItem);
+        }, 300);
+    });
+}

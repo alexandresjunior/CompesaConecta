@@ -1,9 +1,10 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Post from "../../componentes/Post";
-import listarPublicacoes from '../../servicos/publicacoes';
+import { listarPublicacoes } from '../../servicos/publicacoes';
 
 const LOGO_COMPESA_CONECTA = require('../../../assets/images/compesa_conecta_logo_horizontal.png');
 
@@ -12,14 +13,23 @@ function Feed() {
   const [carregando, setCarregando] = useState(true);
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    async function carregarPublicacoes() {
+  const carregarPublicacoesDoFeed = useCallback(async () => {
+    setCarregando(true);
+    try {
       const dados = await listarPublicacoes();
       setPublicacoes(dados);
+    } catch (error) {
+      console.error("Erro ao carregar publicações:", error);
+    } finally {
       setCarregando(false);
     }
-    carregarPublicacoes();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarPublicacoesDoFeed();
+    }, [carregarPublicacoesDoFeed])
+  );
 
   if (carregando) {
     return (
@@ -36,7 +46,7 @@ function Feed() {
 
       <View style={estilos.header}>
         <Image source={LOGO_COMPESA_CONECTA} style={estilos.logoAppHeader} />
-        <TouchableOpacity onPress={() => { }}>
+        <TouchableOpacity onPress={() => router.push("telas/NovaPublicacao")}>
           <FontAwesome name="plus-square-o" size={35} color="#1A237E" />
         </TouchableOpacity>
       </View>
@@ -47,6 +57,13 @@ function Feed() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={estilos.listContainer}
         showsVerticalScrollIndicator={false}
+        refreshing={carregando}
+        onRefresh={carregarPublicacoesDoFeed}
+        ListEmptyComponent={() => (
+          <View style={estilos.emptyFeedContainer}>
+            <Text style={estilos.emptyFeedText}>Nenhuma publicação encontrada. Seja o primeiro a postar!</Text>
+          </View>
+        )}
       />
     </SafeAreaView>
   );
@@ -82,5 +99,14 @@ const estilos = StyleSheet.create({
     width: 150,
     height: 50,
     resizeMode: 'contain',
-  }
+  },
+  emptyFeedContainer: {
+    paddingVertical: 50,
+    alignItems: 'center',
+  },
+  emptyFeedText: {
+    fontSize: 16,
+    color: '#888',
+    fontStyle: 'italic',
+  },
 });
