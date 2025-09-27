@@ -1,50 +1,100 @@
-# Welcome to your Expo app 👋
+<div align='center' style='margin-bottom: 10px;'>
+   <img src='assets/images/compesa_conecta_logo_horizontal.png' width='200px'>
+</div>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ **COMPESA Conecta** é a rede social corporativa interna da COMPESA, desenvolvida para ser a principal plataforma de comunicação e engajamento entre os colaboradores. O aplicativo foi projetado para disseminar informações importantes, especialmente durante o processo de reestruturação interna da empresa, fortalecendo a cultura e o alinhamento entre as equipes.
 
-## Get started
+Este projeto foi desenvolvido utilizando **React Native** com **Expo**.
 
-1. Install dependencies
+## ✨ Funcionalidades Principais
 
-   ```bash
-   npm install
-   ```
+  * **Autenticação de Usuário**: Tela de _login_ com opção de "Mantenha-me conectado" para persistência de sessão.
+  * **Feed de Publicações**: Visualização de posts em ordem cronológica, com suporte para:
+      * Texto
+      * Imagens (múltiplas, em formato carrossel)
+      * Vídeos
+      * Enquetes interativas
+  * **Interação Social**:
+      * Curtir publicações.
+      * Comentar em posts (com permissão para exclusão/moderação por usuários do tipo administrador).
+      * Compartilhar o conteúdo de uma publicação externamente (via WhatsApp, por exemplo).
+  * **Gerenciamento de Conteúdo por Nível de Acesso**:
+      * **Nível 1 (Leitor)**: Visualiza e comenta.
+      * **Nível 2 (Publicador)**: Cria publicações e adiciona FAQs.
+      * **Nível 3 (Administrador)**: Todas as permissões anteriores, mais a capacidade de remover publicações, comentários e FAQs.
+  * **Seção de FAQ**: Uma área de Perguntas Frequentes, onde usuários autorizados podem adicionar novos itens.
+  * **Perfil de Usuário**: Tela com informações do usuário logado e botão para Sair (_Logout_).
+  * **Interface Responsiva e Intuitiva**: Foco na usabilidade, com _previews_ de mídia, tratamento de estado offline e feedback visual para o usuário.
 
-2. Start the app
+## 🚀 Tecnologias Utilizadas
 
-   ```bash
-   npx expo start
-   ```
+Este projeto foi construído com as seguintes tecnologias e bibliotecas principais:
 
-In the output, you'll find options to open the app in a
+  * **React Native**: Estrutura principal para o desenvolvimento mobile.
+  * **Expo**: Plataforma para facilitar o desenvolvimento e _build_ do aplicativo.
+  * **Expo Router**: Para navegação baseada em arquivos (_file-based routing_).
+  * **Expo Image Picker & Video Thumbnails**: Para seleção e _ de mídias da galeria do usuário.
+  * **React Native Safe Area Context**: Para garantir que a UI se ajuste corretamente em dispositivos com _notches_ e ilhas dinâmicas.
+  * **Expo Checkbox**: Para o componente de _checkbox_ na tela de _login_.
+  * **Axios**: Para as chamadas de API.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## ⚙️ Começando
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Siga as instruções abaixo para configurar e executar o projeto em seu ambiente de desenvolvimento local.
 
-## Get a fresh project
+### Pré-requisitos
 
-When you're ready, run:
+  * Node.js (versão 22.20.0 ou superior)
+  * npm (versão 10.9.3 ou superior)
+  * [Expo Go](https://expo.dev/go) instalado no seu smartphone (Android/iOS) ou um emulador/simulador configurado.
 
-```bash
-npm run reset-project
+  Este aplicativo foi desenvolvido de forma compatível com o novo SDK 34.
+
+### Instalação
+
+1.  **Clone o repositório:**
+
+    ```bash
+    git clone https://github.com/alexandresjunior/CompesaConecta.git
+    cd CompesaConecta
+    ```
+
+2.  **Instale as dependências do projeto:**
+
+    ```bash
+    npm install
+    ```
+
+3. **Inicie o aplicativo:**
+    Com o servidor _backend_ no ar, inicie o projeto Expo:
+
+    ```bash
+    npm start
+    ```
+
+Após a execução, um QR Code aparecerá no terminal. Escaneie-o com o aplicativo Expo Go no seu celular, ou escolha uma das opções para abrir em um emulador/simulador.
+
+## 📁 Estrutura do Projeto
+
+A estrutura de pastas está organizada da seguinte forma:
+
+```
+/
+|-- app/                  # Contém todas as telas e a lógica de navegação
+|   |-- (tabs)/           # Grupo de rotas para telas com barra de navegação
+|   |   |-- Feed/
+|   |   |-- Faq/
+|   |   |-- Perfil/
+|   |   `-- _layout.jsx   # Layout da barra de navegação (Tabs)
+|   |-- Comentarios/
+|   |-- Login/
+|   |-- NovaPublicacao/
+|   `-- _layout.tsx       # Layout principal da aplicação (Stack)
+|-- assets/               # Imagens, fontes e outros arquivos estáticos
+|-- componentes/          # Componentes reutilizáveis (Post, FaqItem, etc.)
+|-- mocks/                # Arquivos com dados e lógica de simulação do backend
+|-- servicos/             # Funções para interagir com a API (ou mocks)
+`-- package.json          # Dependências e scripts do projeto
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+-----
