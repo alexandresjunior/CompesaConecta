@@ -99,10 +99,9 @@ function Post({ item, onRemove }) {
           <Text style={estilos.nomeAutor}>{item.autor.nome}</Text>
           <Text style={estilos.timestamp}>{new Date(item.timestamp).toLocaleDateString('pt-BR')}</Text>
         </View>
-        {/* Botão de Remover Post */}
         {USUARIO_LOGADO.nivel >= 3 && (
           <TouchableOpacity style={estilos.botaoRemoverPost} onPress={handleRemovePress}>
-            <FontAwesome name="trash-o" size={22} color="#D32F2F" />
+            <FontAwesome name="trash-o" size={25} color="#D32F2F" />
           </TouchableOpacity>
         )}
       </View>
@@ -244,7 +243,8 @@ const estilos = StyleSheet.create({
     flex: 1,
   },
   botaoRemoverPost: {
-    padding: 5,
+    paddingHorizontal: 5,
     marginLeft: 10,
+    marginTop: -10
   },
 });

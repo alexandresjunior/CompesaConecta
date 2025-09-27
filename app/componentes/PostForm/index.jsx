@@ -27,20 +27,27 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
     };
 
     const handleAddOption = () => {
-        setOpcoesEnquete([...opcoesEnquete, '']);
+        if (opcoesEnquete.length < 5) {
+            setOpcoesEnquete([...opcoesEnquete, '']);
+        } else {
+            Alert.alert('Limite de Opções', 'Você pode adicionar no máximo 5 opções.');
+        }
     };
 
-    const handleOptionChange = (text, index) => {
-        const newOptions = [...opcoesEnquete];
-        newOptions[index] = text;
-        setOpcoesEnquete(newOptions);
+    const handleRemoveOption = (indexToRemove) => {
+        if (opcoesEnquete.length > 2) {
+            setOpcoesEnquete(opcoesEnquete.filter((_, index) => index !== indexToRemove));
+        } else {
+            Alert.alert('Limite de Opções', 'A enquete deve ter no mínimo 2 opções.');
+        }
     };
 
-    const handleRemoveOption = (index) => {
-        const newOptions = [...opcoesEnquete];
-        newOptions.splice(index, 1);
-        setOpcoesEnquete(newOptions);
+    const handleOptionChange = (text, indexToChange) => {
+        const novasOpcoes = [...opcoesEnquete];
+        novasOpcoes[indexToChange] = text;
+        setOpcoesEnquete(novasOpcoes);
     };
+
 
     const handleSubmit = () => {
         if (!legenda.trim() && tipoPublicacao === 'TEXTO') {
@@ -98,7 +105,8 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
 
                 <TextInput
                     style={[estilos.input, estilos.textArea]}
-                    placeholder="O que você quer compartilhar? (Legenda)"
+                    placeholder="O que você deseja compartilhar?"
+                    placeholderTextColor="#666"
                     value={legenda}
                     onChangeText={setLegenda}
                     multiline
@@ -111,32 +119,28 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                         onPress={() => { setTipoPublicacao('TEXTO'); setMidiaUri([]); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
                         disabled={isLoading}
                     >
-                        <FontAwesome name="text-width" size={20} color={tipoPublicacao === 'TEXTO' ? '#FFF' : '#333'} />
-                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'TEXTO' && estilos.tipoTextoAtivo]}>Texto</Text>
+                        <FontAwesome name="text-width" size={25} color={tipoPublicacao === 'TEXTO' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'IMAGEM' && estilos.tipoBotaoAtivo]}
                         onPress={() => { setTipoPublicacao('IMAGEM'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
                         disabled={isLoading}
                     >
-                        <FontAwesome name="image" size={20} color={tipoPublicacao === 'IMAGEM' ? '#FFF' : '#333'} />
-                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'IMAGEM' && estilos.tipoTextoAtivo]}>Imagem</Text>
+                        <FontAwesome name="image" size={25} color={tipoPublicacao === 'IMAGEM' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'VIDEO' && estilos.tipoBotaoAtivo]}
                         onPress={() => { setTipoPublicacao('VIDEO'); setPerguntaEnquete(''); setOpcoesEnquete(['', '']); }}
                         disabled={isLoading}
                     >
-                        <FontAwesome name="video-camera" size={20} color={tipoPublicacao === 'VIDEO' ? '#FFF' : '#333'} />
-                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'VIDEO' && estilos.tipoTextoAtivo]}>Vídeo</Text>
+                        <FontAwesome name="video-camera" size={25} color={tipoPublicacao === 'VIDEO' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[estilos.tipoBotao, tipoPublicacao === 'ENQUETE' && estilos.tipoBotaoAtivo]}
                         onPress={() => { setTipoPublicacao('ENQUETE'); setMidiaUri([]); }}
                         disabled={isLoading}
                     >
-                        <FontAwesome name="bar-chart" size={20} color={tipoPublicacao === 'ENQUETE' ? '#FFF' : '#333'} />
-                        <Text style={[estilos.tipoTexto, tipoPublicacao === 'ENQUETE' && estilos.tipoTextoAtivo]}>Enquete</Text>
+                        <FontAwesome name="bar-chart" size={25} color={tipoPublicacao === 'ENQUETE' ? '#FFF' : '#333'} />
                     </TouchableOpacity>
                 </View>
 
@@ -154,6 +158,7 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                         <TextInput
                             style={estilos.input}
                             placeholder="Pergunta da enquete"
+                            placeholderTextColor="#666"
                             value={perguntaEnquete}
                             onChangeText={setPerguntaEnquete}
                             disabled={isLoading}
@@ -163,37 +168,39 @@ function PostForm({ onSubmit, onCancel, isLoading }) {
                                 <TextInput
                                     style={[estilos.input, estilos.opcaoInput]}
                                     placeholder={`Opção ${index + 1}`}
+                                    placeholderTextColor="#666"
                                     value={opcao}
                                     onChangeText={(text) => handleOptionChange(text, index)}
                                     disabled={isLoading}
                                 />
                                 {opcoesEnquete.length > 2 && (
                                     <TouchableOpacity onPress={() => handleRemoveOption(index)} style={estilos.removerOpcaoBtn} disabled={isLoading}>
-                                        <AntDesign name="minuscircleo" size={20} color="#D32F2F" />
+                                        <AntDesign name="minus-circle" size={20} color="#D32F2F" />
                                     </TouchableOpacity>
                                 )}
                             </View>
                         ))}
                         <TouchableOpacity style={estilos.botaoAddOpcao} onPress={handleAddOption} disabled={isLoading}>
-                            <AntDesign name="pluscircleo" size={20} color="#0D47A1" />
                             <Text style={estilos.textoAddOpcao}>Adicionar Opção</Text>
                         </TouchableOpacity>
                     </View>
                 )}
-            </ScrollView>
 
-            <View style={estilos.footer}>
-                <TouchableOpacity style={[estilos.botaoAcaoSecundario, { marginRight: 10 }]} onPress={onCancel} disabled={isLoading}>
-                    <Text style={estilos.textoBotaoAcaoSecundario}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={estilos.botaoAcaoPrincipal} onPress={handleSubmit} disabled={isLoading}>
-                    {isLoading ? (
-                        <ActivityIndicator color="#FFF" />
-                    ) : (
-                        <Text style={estilos.textoBotaoAcaoPrincipal}>Publicar</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
+                <View style={estilos.footer}>
+                    <TouchableOpacity
+                        style={[estilos.botaoAcaoSecundario, { marginRight: 10 }]}
+                        onPress={onCancel} disabled={isLoading}>
+                        <Text style={estilos.textoBotaoAcaoSecundario}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={estilos.botaoAcaoPrincipal} onPress={handleSubmit} disabled={isLoading}>
+                        {isLoading ? (
+                            <ActivityIndicator color="#FFF" />
+                        ) : (
+                            <Text style={estilos.textoBotaoAcaoPrincipal}>Publicar</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </View>
     );
 }
@@ -204,7 +211,6 @@ const estilos = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F4F6F8',
-        paddingTop: 10,
     },
     scrollContent: {
         paddingHorizontal: 20,
@@ -214,7 +220,7 @@ const estilos = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#1A237E',
-        marginBottom: 20,
+        marginVertical: 20,
         textAlign: 'center',
     },
     input: {
@@ -278,7 +284,6 @@ const estilos = StyleSheet.create({
         fontSize: 16,
     },
     enqueteSection: {
-        marginTop: 10,
         backgroundColor: '#FFF',
         padding: 15,
         borderRadius: 8,
@@ -294,10 +299,10 @@ const estilos = StyleSheet.create({
     opcaoInput: {
         flex: 1,
         marginBottom: 0,
-        marginRight: 10,
     },
     removerOpcaoBtn: {
         padding: 5,
+        marginStart: 10,
     },
     botaoAddOpcao: {
         flexDirection: 'row',
@@ -318,17 +323,15 @@ const estilos = StyleSheet.create({
     },
     footer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
-        padding: 15,
-        borderTopWidth: 1,
-        borderTopColor: '#E0E0E0',
-        backgroundColor: '#FFF',
+        justifyContent: 'space-between',
     },
     botaoAcaoSecundario: {
+        flex: 1,
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 8,
         backgroundColor: '#E0E0E0',
+        alignItems: 'center',
     },
     textoBotaoAcaoSecundario: {
         color: '#333',
@@ -336,6 +339,7 @@ const estilos = StyleSheet.create({
         fontSize: 16,
     },
     botaoAcaoPrincipal: {
+        flex: 1,
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 8,
