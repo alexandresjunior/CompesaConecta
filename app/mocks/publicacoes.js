@@ -6,7 +6,7 @@ let LISTA_PUBLICACOES = [
     autor: {
       id: '2',
       nome: 'Gestão de Mudança',
-      avatar: 'https://cdn-icons-png.flaticon.com/512/3874/3874136.png' // Ícone genérico
+      avatar: 'https://cdn-icons-png.flaticon.com/512/3874/3874136.png'
     },
     legenda: 'Olá, equipe! Bem-vindos ao COMPESA Conecta. Este é o nosso novo canal para comunicarmos todas as novidades sobre o processo de reestruturação. Fiquem ligados!',
     tipo: 'TEXTO',
@@ -27,9 +27,9 @@ let LISTA_PUBLICACOES = [
     legenda: 'Compartilhando algumas fotos da nossa última visita técnica na ETA Tapacurá. O trabalho em equipe faz a diferença!',
     tipo: 'IMAGEM',
     imagens: [
-      'https://www.agenciainfra.com/blog/wp-content/uploads/2023/11/Compesa.jpeg',
-      'https://www.folhape.com.br/obj/1/276532,470,80,0,0,0,0,0,0,0.jpg',
-      'https://jconlineimagem.ne10.uol.com.br/imagem/galeria/2019/03/22/153351_3238.jpg'
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJCnVXnYl4WSLMQrSkp8YNhIcAZ_64bOFmMA&s',
+      'https://servicos.compesa.com.br/wp-content/uploads/2019/08/sistema-tapacura-700x430.jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7ksG0tpZxOzcnTTB3fkcYRpw5b4ayCZppCH6BQ3kzsMbtAevz0SNAFmYwa3iYjgDnSxA&usqp=CAU'
     ],
     timestamp: '2025-09-26T11:30:00Z',
     curtidas: 22,

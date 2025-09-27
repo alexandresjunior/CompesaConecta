@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Dimensions, FlatList, Image, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import Comentario from "../Comentario";
@@ -11,6 +11,17 @@ const { width } = Dimensions.get("window");
 
 function Post({ item, onRemove }) {
   const [curtido, setCurtido] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      setActiveIndex(viewableItems[0].index || 0);
+    }
+  }).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50
+  }).current;
 
   const handleShare = async () => {
     try {
@@ -46,17 +57,34 @@ function Post({ item, onRemove }) {
         return null;
       case "IMAGEM":
         return (
-          <FlatList
-            data={item.imagens}
-            renderItem={({ item: imagemUrl }) => (
-              <Image source={{ uri: imagemUrl }} style={estilos.imagemPost} />
+          <View>
+            <FlatList
+              data={item.imagens}
+              renderItem={({ item: imagemUrl }) => (
+                <Image source={{ uri: imagemUrl }} style={estilos.imagemPost} />
+              )}
+              keyExtractor={(imagemUrl) => imagemUrl}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              style={estilos.carousel}
+            />
+            {item.imagens.length > 1 && (
+              <View style={estilos.paginationContainer}>
+                {item.imagens.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      estilos.dot,
+                      activeIndex === index ? estilos.activeDot : estilos.inactiveDot,
+                    ]}
+                  />
+                ))}
+              </View>
             )}
-            keyExtractor={(imagemUrl) => imagemUrl}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            style={estilos.carousel}
-          />
+          </View>
         );
       case "VIDEO":
         const videoId = item.videoUrl.split("v=")[1];
@@ -187,7 +215,25 @@ const estilos = StyleSheet.create({
     marginRight: 10,
   },
   carousel: {
-    marginBottom: 10,
+    marginBottom: 15,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#0D47A1',
+  },
+  inactiveDot: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   video: {
     width: "100%",
