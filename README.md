@@ -98,3 +98,8 @@ A estrutura de pastas está organizada da seguinte forma:
 ```
 
 -----
+
+## Como gerar um build da aplicação
+
+1. Ver [documentação oficial](https://docs.expo.dev/build/setup/)
+2. Verificar processo de build e baixar `.apk` (ou `.aab`) no [link](https://expo.dev/accounts/alexandresjunior/projects/CompesaConecta)

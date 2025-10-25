@@ -19,7 +19,8 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "br.com.compesa.conecta.app"
     },
     "web": {
       "bundler": "metro",
